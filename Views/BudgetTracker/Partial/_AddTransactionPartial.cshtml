@@ -1,0 +1,29 @@
+﻿@* Passendes Model erzeugen und Radio Buttons ob Negativer oder Positiver Betrag was dann auch die Selects ändert *@
+
+
+<div id="addTransactionContainer">
+    <form asp-action="AddTransaction" method="post">
+        <div class="form-group">
+            <label for="transactionName">Beschreibung</label>
+            <input name="name" type="text" class="form-control" id="transactionName" placeholder="Name">
+        </div>
+        <div class="form-group">
+            <label for="transactionAmount">Betrag</label>
+            <input name="amount" type="number" class="form-control" id="transactionAmount" placeholder="Betrag">
+        </div>
+        <div class="form-group">
+            <label for="transactionDate">Datum</label>
+            <input name="date" type="month" class="form-control" id="transactionDate" value="@DateTime.Now.ToString("yyyy-MM")">
+        </div>
+        <div class="form-group">
+            <label for="transactionCategory">Kategorie</label>
+            <select name="category" class="form-control" id="transactionCategory">
+                <option value="2">Lebensmittel</option>
+                <option value="3">Freizeit</option>
+                <option value="4">Hobby</option>
+                <option value="5">Sonstiges</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Hinzufügen</button>
+    </form>
+</div>

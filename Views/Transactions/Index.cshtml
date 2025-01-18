@@ -1,0 +1,63 @@
+﻿@model IEnumerable<BudgetTracker.Models.Transaction>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Übersicht</h1>
+
+<p>
+    <a class="btn btn-warning" asp-action="Create">Neue Ausgabe</a>
+    <a class="btn btn-success" asp-action="CreateIncome">Neue Einnahme</a>
+</p>
+<div class="table-responsive rounded border-1" style="max-height: 600px;">
+    <table class="table table-striped table-bordered rounded">
+        <thead class="thead-dark" style="position: sticky; top: 0; z-index: 1;background-color: white;">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Account)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @item.Date.ToString("yyyy MMMM")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Account.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.TransactionId" class="btn btn-warning btn-sm">Edit</a> |
+                        @* <a asp-action="Details" asp-route-id="@item.TransactionId" class="btn btn-info btn-sm">Details</a> | *@
+                        <a asp-action="Delete" asp-route-id="@item.TransactionId" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,85 @@
+﻿@model BudgetTracker.Models.ViewModel.DashboardViewModel
+<script>
+    const chartData = @Html.Raw(Json.Serialize(Model));
+</script>
+<script defer src="~/js/dashboard.js"></script>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@*TODO: Dynamisch auf Mobil anpassen*@
+
+
+<div id="main">
+    <div id="maincontainer">
+        <div id="dashboardcontainer">
+            <div id="UpperContainer" class="container mt-4">
+                <div class="row d-flex justify-content-evenly">
+                    <!-- Verfügbares Guthaben -->
+                    <div class="col-md-3">
+                        <div class="card text-center h-100">
+                            <div class="card-header">
+                                <h5>Gesamtvermögen</h5>
+                            </div>
+                            <div id="InnerTotalContainer" class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                <h4>@Model.Total€</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Konten Guthaben -->
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-header">
+                                <h5>Konten Guthaben</h5>
+                            </div>
+                            <div class="d-flex justify-content-evenly mt-3">
+                                @foreach (var account in Model.AccountBalance)
+                                {
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <strong>@account.Name</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>@account.Balance€</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Einnahmen und Ausgaben -->
+                    <div id="OverviewContainer" class="col-3">
+                        <div id="OverviewCard" class="card text-center">
+                            <div class="card-header">
+                                <h5>Januar 2025</h5>
+                            </div>
+                            <div class="card-body mt-3">
+                                <p>Einnahmen: <span class="float-end">@Model.CurrentMonthIncome €</span></p>
+ @*                                <p>Fixkosten: <span class="float-end">-0 €</span></p>
+                                <p>Sparen: <span class="float-end">0 €</span></p> *@
+                                <p>gesamte Ausgaben: <span class="float-end">@Model.CurrentMonthExpense €</span></p>
+                                <hr>
+                                <h5>Verfügbar: @Model.CurrentMonthSavings €</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="MidContainer1" class="container mt-4">
+                <div id"LineChart">
+                    <canvas id="lineChart" width="400" height="100"></canvas>
+                </div>
+            </div>
+            <div id="LowerContainer" class="mt-5">
+                <div id="doughnutContainer" class="w-25">
+                    <p>Ausgaben nach Kategorie im Januar</p>
+                    <canvas id="doughnutChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

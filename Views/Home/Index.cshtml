@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script>
+    const chartData = @Html.Raw(Json.Serialize(Model));
+</script>
+
+<div class="text-center">
+    <p>Willkommen auf der BudgetTracker-Startseite!</p>
+    <p>Bitte Login sie sich ein, um fortzufahren.</p>
+    <p>Testaccount Daten werden dort angezeigt.</p>
+</div>

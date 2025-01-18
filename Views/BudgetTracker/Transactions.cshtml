@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+
+
+<div id="transactionMain">
+    <div id="transactionNavigation">
+        <a asp-controller="BudgetTracker" asp-action="GetPartialAddTransaction" data-ajax="true" data-ajax-update="#innerPartialContainer" class="btn btn-primary">Hinzufügen</a>
+        <a class="btn btn-primary">Bearbeiten</a>
+    </div>
+    <div id="innerPartialContainer">
+
+    </div>
+</div>
