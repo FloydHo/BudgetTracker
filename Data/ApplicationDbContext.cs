@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BudgetTracker.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BudgetTracker.Data
 {
@@ -9,7 +10,6 @@ namespace BudgetTracker.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
-
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -36,7 +36,7 @@ namespace BudgetTracker.Data
                 .HasOne(a => a.Account)
                 .WithMany(a => a.Transactions)
                 .HasForeignKey(a => a.AccountId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

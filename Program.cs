@@ -17,7 +17,7 @@ namespace BudgetTracker
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlite(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>()
@@ -26,6 +26,7 @@ namespace BudgetTracker
 
             builder.Services.AddScoped<TransactionRepository>();
             builder.Services.AddScoped<TransactionService>();
+            builder.Services.AddScoped<AccountsService>();
 
             var app = builder.Build();
 
@@ -65,7 +66,9 @@ namespace BudgetTracker
         public static void CreateMockData(ApplicationDbContext context)
         {
 
-            var userId = "4c85580d-89ad-4499-8ffd-37040aeb7699";
+            var userId = "1a38ef53-76d3-45af-ad86-4d490b00eac2";
+
+            DateTime currentDate = new DateTime(2025, DateTime.Now.Month, 1);
 
             var account = new Account
             {
@@ -88,7 +91,7 @@ namespace BudgetTracker
             var transactions = new List<Transaction>();
             var random = new Random();
 
-            for (int month = 1; month <= 12; month++)
+            for (int month = 0; month < 12; month++)
             {
                 transactions.Add(new Transaction
                 {
@@ -96,7 +99,7 @@ namespace BudgetTracker
                     CategoryId = categories.First(c => c.Name == "Einkommen").CategoryId,
                     Amount = 2000m,
                     Description = "Monatliches Einkommen",
-                    Date = new DateTime(2024, month, 1),
+                    Date = currentDate.AddMonths(-month),
                     IsRecurring = true,
                     RecurrenceFrequency = Frequency.Monthly
                 });
@@ -107,9 +110,9 @@ namespace BudgetTracker
                     {
                         AccountId = account.AccountId,
                         CategoryId = category.CategoryId,
-                        Amount = Math.Round((decimal)random.Next(50, 500) * -1, 2), 
-                        Description = $"Ausgabe für {category.Name}",
-                        Date = new DateTime(2024, month, random.Next(1, 28)),
+                        Amount = Math.Round((decimal)random.Next(20, 700) * -1, 2), 
+                        Description = $"Ausgabe fï¿½r {category.Name}",
+                        Date = currentDate.AddMonths(-month),
                         IsRecurring = false,
                         RecurrenceFrequency = Frequency.None
                     });

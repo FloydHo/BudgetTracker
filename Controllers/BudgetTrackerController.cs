@@ -8,10 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetTracker.Controllers
 {
-
-
-
-    //Ein einziger Controller sollte genügen anstatt seperat für Dahboard, Transaction und Accounts
     [Authorize]
     public class BudgetTrackerController : Controller
     {
@@ -27,7 +23,8 @@ namespace BudgetTracker.Controllers
         public async Task<ActionResult> Dashboard()
         {
             int currentMonth = DateTime.Now.Month;
-            int currentYear = 2024;
+            int currentYear = DateTime.Now.Year;
+
             decimal savingsOverTime = 0;
 
             List<TransactionDto> transactions = _transactionService.GetAllTransactionsByUserId((await _userManager.GetUserAsync(HttpContext.User)).Id).Result;
@@ -40,6 +37,9 @@ namespace BudgetTracker.Controllers
                 CurrentMonthExpense = transactions.Where(t => t.Amount < 0 && t.Date.Month == currentMonth && t.Date.Year == currentYear).Sum(t => t.Amount).ToString("0.00"),
                 CurrentMonthSavings = transactions.Where(t => t.Date.Month == currentMonth && t.Date.Year == currentYear).Sum(t => t.Amount).ToString("0.00"),
             };
+
+
+            /*************   Linechart Data    *******************/
 
             DateTime twelveMonthsAgo = DateTime.Now.AddMonths(-12);
             decimal preMonthBalance = transactions.Where(t => t.Date < twelveMonthsAgo).Sum(t => t.Amount);
@@ -78,6 +78,9 @@ namespace BudgetTracker.Controllers
                 dashboardViewModel.AccountBalance.Add((acc.Name, acc.Balance.ToString("0.00")));
             }
 
+
+            /*************   Doughnutchart Data    *******************/
+
             List<string> ExpensesInMonthByCategoryLabels = new List<string>();
             List<decimal> ExpensesInMonthByCategoryAmount = new List<decimal>();
 
@@ -90,8 +93,11 @@ namespace BudgetTracker.Controllers
                     Amount = s.Sum(t => t.Amount)
                 }).ToList())
             {
-                ExpensesInMonthByCategoryLabels.Add(category.Category);
-                ExpensesInMonthByCategoryAmount.Add(category.Amount*-1);
+                if(!String.IsNullOrWhiteSpace(category.Category))
+                {
+                    ExpensesInMonthByCategoryLabels.Add(category.Category);
+                    ExpensesInMonthByCategoryAmount.Add(category.Amount*-1);
+                }
             }
 
             dashboardViewModel.ExpensesInMonthByCategoryLabels = ExpensesInMonthByCategoryLabels.ToArray();
@@ -115,7 +121,6 @@ namespace BudgetTracker.Controllers
         public async Task AddTransaction(int category, string date, decimal amount, string name)
         {
             string userid = ((await _userManager.GetUserAsync(HttpContext.User)).Id);
-            _transactionService.AddTransaction(userid, category, date, amount, name);
         }
 
     }

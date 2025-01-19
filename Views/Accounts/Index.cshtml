@@ -1,0 +1,95 @@
+﻿@{
+    var accounts = (List<(int aid, string name, decimal balance)>)ViewData["Accounts"];
+}
+<script defer src="~/js/accounts.js"></script>
+
+
+<h2>Übersicht aller Konten</h2>
+
+@*Todo: Beim auswählen des Kontos alle Transaktion von diesem anzeigen lassen*@
+
+
+<div id"accountsMain" class="text-center">
+    <div class="container-fluid mt-3 mb-3 d-flex justify-content-start">
+        <button id="btn_toggleAddAccount" class="btn btn-primary btn_toggleAddAccount">Neues Konto</button>
+        <div id="addAccountContainer" style="display: none;">
+            <div class="d-flex">
+                <form asp-action="AddAccount" method="post">
+                    <input name="name" id="field_addAccount" type="text" placeholder="Kontoname" />
+                    <input class="btn btn-primary"  type="submit" value="Hinzufügen" />
+                </form>
+                <button class="ms-2 btn btn-primary btn_toggleAddAccount">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    @************************* List Header  **********************************@
+
+    <div id="accountOverviewGroup" class="list-group shadow">
+        <div class="list-group-item">
+            <div class="row">
+                <div class="col-6">
+                    <div class="d-flex flex-column text-start">
+                        <h5>Gesamt</h5>
+                        <p style="color: lightgray; margin: 0;">Alle Konten</p>
+                    </div>
+                </div>
+                <div class="col-6 d-flex align-items-center justify-content-end">
+                    <h5>@String.Format("{0:N2}", ViewData["Total"]) €</h5>
+                </div>
+            </div>
+        </div>
+
+        @************************* List Body  **********************************@
+        
+            @if (accounts != null && accounts.Count > 0)
+            {
+                @foreach (var account in accounts)
+                {
+                    <div class="list-group-item">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="d-flex flex-column text-start">
+                                    <h6 id="txt_accountName">@account.name</h6>
+
+                                    <div id="editAccountContainer" style="display: none;">
+                                        <div class="d-flex">
+                                            <form asp-action="Edit" method="post">
+                                                <input minlength="5" maxlength="20" required name="name" id="field_editAccount" type="text" placeholder="Kontoname" />
+                                                <input type="hidden" name="aid" value="@account.aid" />
+                                                <input class="btn btn-primary" type="submit" value="Speichern" />
+                                            </form>
+                                        <button class="ms-2 btn btn-primary btn_abortEditAccount">Abbrechen</button>
+                                        </div>
+                                    </div>
+                                    <div id="container_options"> 
+                                        <button class="btn btn-sm btn-outline-secondary px-1 py-0 btn_toggleEditAccount">Bearbeiten</button>
+                                        <button class="btn btn-danger btn-sm px-1 py-0 btn_toggledelete">Löschen</button>
+                                    </div>
+                                    <div style="display: none;" id="delete_sure">
+                                        <p>Sind Sie sicher?</p>
+                                        <a asp-action="Delete" asp-route-aid="@account.aid" class="btn btn-danger btn-sm px-1 py-0">Ja</a>
+                                        <button class="btn btn-primary btn-sm px-1 py-0 btn_toggledelete">Nein</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-6 d-flex align-items-center justify-content-end">
+                                <h6>@String.Format("{0:N2}", account.balance) €</h6>
+                            </div>
+                        </div>
+                    </div>
+                }              
+            }
+            else
+            {
+                <div class="list-group-item">
+                    <div class="row">
+                        <div class="col-12">
+                            <p>Keine Konten vorhanden</p>
+                        </div>
+                    </div>
+                </div>
+            }
+    </div>
+</div>

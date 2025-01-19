@@ -10,9 +10,11 @@ using BudgetTracker.Models;
 using BudgetTracker.Services;
 using Microsoft.AspNetCore.Identity;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BudgetTracker.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -65,13 +67,13 @@ namespace BudgetTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(decimal Amount, string Description, string Date, int CategoryId)
+        public async Task<IActionResult> Create(decimal Amount, string Description, string Date, int AccountId, int CategoryId)
         {
 
             if(Amount != 0)
             {
                 string userid = ((await _userManager.GetUserAsync(HttpContext.User)).Id);
-                _transactionService.AddTransaction(userid, CategoryId, Date, Amount, Description, false);
+                _transactionService.AddTransaction(userid, CategoryId, Date, Amount, Description, AccountId, false);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "Name");
@@ -89,12 +91,12 @@ namespace BudgetTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateIncome(decimal Amount,string Description, string Date, int CategoryId)
+        public async Task<IActionResult> CreateIncome(decimal Amount,string Description, string Date, int AccountId, int CategoryId)
         {
             if (Amount != 0)
             {
                 string userid = ((await _userManager.GetUserAsync(HttpContext.User)).Id);
-                _transactionService.AddTransaction(userid, CategoryId, Date, Amount, Description, true);
+                _transactionService.AddTransaction(userid, CategoryId, Date, Amount, Description, AccountId, true);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "Name");
@@ -114,12 +116,14 @@ namespace BudgetTracker.Controllers
             }
 
             var transaction = await _context.Transactions.FindAsync(id);
+            transaction.Amount = Math.Abs(transaction.Amount);
             if (transaction == null)
             {
                 return NotFound();
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountId", transaction.AccountId);
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "Name", transaction.AccountId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name", transaction.CategoryId);
+            TempData["TransactionId"] = transaction.TransactionId;
             return View(transaction);
         }
 
@@ -128,36 +132,22 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,Amount,Description,Date,AccountId,CategoryId,IsRecurring,RecurrenceFrequency")] Transaction transaction)
+        public async Task<IActionResult> Edit(int TransactionId, decimal Amount, string Description, string Date, int AccountId, int CategoryId)
         {
-            if (id != transaction.TransactionId)
+            if (TransactionId != (int)(TempData["TransactionId"] ?? 0))
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (Amount != 0)
             {
-                try
-                {
-                    _context.Update(transaction);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TransactionExists(transaction.TransactionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                string userid = ((await _userManager.GetUserAsync(HttpContext.User)).Id);
+                _transactionService.EditTransaction(TransactionId, CategoryId, Date, Amount, Description, AccountId);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountId", transaction.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name", transaction.CategoryId);
-            return View(transaction);
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "Name");
+            ViewData["CategoryId"] = new SelectList(_context.Categories.Where(c => !c.IsIncome), "CategoryId", "Name");
+            return RedirectToAction("Edit");
         }
 
         // GET: Transactions/Delete/5

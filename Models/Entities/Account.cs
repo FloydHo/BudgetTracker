@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BudgetTracker.Models
@@ -7,6 +8,9 @@ namespace BudgetTracker.Models
     public class Account
     {
         public int AccountId { get; set; }
+
+        [Required]
+        [StringLength(maximumLength: 20, MinimumLength = 5)]
         public string Name { get; set; } 
         public string UserId { get; set; }
         public virtual IdentityUser User { get; set; }
