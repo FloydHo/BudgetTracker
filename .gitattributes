@@ -2,7 +2,13 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
+# Ignoriere JavaScript-Dateien für die Spracherkennung
+*.js linguist-detectable=false
+*.jsx linguist-detectable=false
 
+# Stelle sicher, dass C# als Hauptsprache erkannt wird
+*.cs linguist-detectable=true
+*.csproj linguist-detectable=true
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
